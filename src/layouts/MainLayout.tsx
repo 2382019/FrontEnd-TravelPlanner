@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../utils/AuthContext';
@@ -11,15 +11,18 @@ function classNames(...classes: string[]) {
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/', current: true },
-    { name: 'Posts', href: '/posts', current: false },
-    { name: 'Budget', href: '/budget', current: false },
-    { name: 'Packing', href: '/packing', current: false },
-    { name: 'Itinerary', href: '/itinerary', current: false },
-    { name: 'Culinary', href: '/culinary', current: false },
-  ];
+    { name: 'Dashboard', href: '/' },
+    { name: 'Budget', href: '/budget' },
+    { name: 'Packing', href: '/packing' },
+    { name: 'Itinerary', href: '/itinerary' },
+    { name: 'Culinary', href: '/culinary' },
+  ].map(item => ({
+    ...item,
+    current: location.pathname === item.href
+  }));
 
   const handleLogout = () => {
     logout();
@@ -79,19 +82,6 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                         leaveTo="transform opacity-0 scale-95"
                       >
                         <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to="/profile"
-                                className={classNames(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                              >
-                                Your Profile
-                              </Link>
-                            )}
-                          </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
                               <button
@@ -176,13 +166,6 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     </div>
                   </div>
                   <div className="mt-3 space-y-1">
-                    <Disclosure.Button
-                      as={Link}
-                      to="/profile"
-                      className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                    >
-                      Your Profile
-                    </Disclosure.Button>
                     <Disclosure.Button
                       as="button"
                       onClick={handleLogout}

@@ -6,22 +6,16 @@ import { culinaryAPI } from '../utils/api';
 interface CulinaryItem {
   id: number;
   name: string;
-  description: string;
+  type: string;
   location: string;
-  price_range: string;
-  cuisine_type: string;
-  rating: number;
-  notes: string;
+  description: string;
 }
 
 interface CulinaryFormData {
   name: string;
-  description: string;
+  type: string;
   location: string;
-  price_range: string;
-  cuisine_type: string;
-  rating: number;
-  notes: string;
+  description: string;
 }
 
 export function Culinary() {
@@ -80,7 +74,7 @@ export function Culinary() {
 
   const culinaryItems = culinaryResponse?.data || [];
   const groupedItems = culinaryItems.reduce((groups, item) => {
-    const type = item.cuisine_type;
+    const type = item.type;
     if (!groups[type]) {
       groups[type] = [];
     }
@@ -129,21 +123,22 @@ export function Culinary() {
 
                 <div>
                   <label
-                    htmlFor="description"
+                    htmlFor="type"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Description
+                    Type
                   </label>
-                  <textarea
-                    {...register('description', { required: 'Description is required' })}
-                    defaultValue={editingItem?.description}
-                    rows={3}
+                  <select
+                    {...register('type', { required: 'Type is required' })}
+                    defaultValue={editingItem?.type}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                  {errors.description && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.description.message}
-                    </p>
+                  >
+                    <option value="">Select a type</option>
+                    <option value="SAVORY">Savory</option>
+                    <option value="SWEET">Sweet</option>
+                  </select>
+                  {errors.type && (
+                    <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
                   )}
                 </div>
 
@@ -167,98 +162,24 @@ export function Culinary() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="cuisine_type"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Cuisine Type
-                    </label>
-                    <select
-                      {...register('cuisine_type', { required: 'Cuisine type is required' })}
-                      defaultValue={editingItem?.cuisine_type}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                      <option value="">Select a cuisine type</option>
-                      <option value="Local">Local</option>
-                      <option value="International">International</option>
-                      <option value="Street Food">Street Food</option>
-                      <option value="Fine Dining">Fine Dining</option>
-                      <option value="Cafe">Cafe</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    {errors.cuisine_type && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.cuisine_type.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="price_range"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Price Range
-                    </label>
-                    <select
-                      {...register('price_range', { required: 'Price range is required' })}
-                      defaultValue={editingItem?.price_range}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                      <option value="">Select price range</option>
-                      <option value="$">$ (Budget)</option>
-                      <option value="$$">$$ (Moderate)</option>
-                      <option value="$$$">$$$ (Expensive)</option>
-                      <option value="$$$$">$$$$ (Luxury)</option>
-                    </select>
-                    {errors.price_range && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.price_range.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
                 <div>
                   <label
-                    htmlFor="rating"
+                    htmlFor="description"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Rating (1-5)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    step="0.5"
-                    {...register('rating', {
-                      required: 'Rating is required',
-                      min: { value: 1, message: 'Minimum rating is 1' },
-                      max: { value: 5, message: 'Maximum rating is 5' },
-                    })}
-                    defaultValue={editingItem?.rating}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                  {errors.rating && (
-                    <p className="mt-1 text-sm text-red-600">{errors.rating.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="notes"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Notes
+                    Description
                   </label>
                   <textarea
-                    {...register('notes')}
-                    defaultValue={editingItem?.notes}
-                    rows={2}
+                    {...register('description', { required: 'Description is required' })}
+                    defaultValue={editingItem?.description}
+                    rows={3}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
+                  {errors.description && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex justify-end space-x-3">
@@ -302,20 +223,11 @@ export function Culinary() {
                           <span className="text-sm font-medium text-gray-900">
                             {item.name}
                           </span>
-                          <span className="text-sm text-gray-500">
-                            {item.price_range}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            Rating: {item.rating}/5
-                          </span>
                         </div>
                         <p className="mt-1 text-sm text-gray-500">{item.description}</p>
                         <p className="mt-1 text-sm text-gray-500">
                           Location: {item.location}
                         </p>
-                        {item.notes && (
-                          <p className="mt-1 text-sm text-gray-500">Notes: {item.notes}</p>
-                        )}
                       </div>
                       <div className="flex space-x-2">
                         <button

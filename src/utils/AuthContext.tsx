@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, User } from './api';
+import { access } from 'fs';
 
 interface AuthContextType {
   user: User | null;
@@ -17,27 +18,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
 
-  useEffect(() => {
-    if (token) {
-      fetchUserProfile();
-    }
-  }, [token]);
 
-  const fetchUserProfile = async () => {
-    try {
-      const response = await authAPI.getProfile();
-      setUser(response.data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      logout();
-    }
-  };
+ 
 
   const login = async (data: { email: string; password: string }) => {
     try {
       const response = await authAPI.login(data);
-      const { token: newToken, user: userData } = response.data;
+      const { access_token: newToken, user: userData } = response.data;
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
@@ -51,10 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: { email: string; password: string; name: string }) => {
     try {
       const response = await authAPI.register(data);
-      const { token: newToken, user: userData } = response.data;
+      const { access_token: newToken, user: userData } = response.data;
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
+
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Registration error:', error);

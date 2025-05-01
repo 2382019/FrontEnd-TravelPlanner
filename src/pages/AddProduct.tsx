@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import ProductForm, { ProductFormInput } from "../components/ProductForm";
-import axios from "../utils/AxiosInstance";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../utils/AxiosInstance";
 
 const addProduct = async (data: ProductFormInput) => {
-  return await axios.post("/products/add", data);
+  return await AxiosInstance.post("/products/add", data);
 };
 
 const AddProduct = () => {

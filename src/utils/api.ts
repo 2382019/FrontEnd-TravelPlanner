@@ -44,34 +44,31 @@ export interface Post {
 export interface BudgetItem {
   id: number;
   category: string;
-  amount: number;
+  unitCost: number;
   description: string;
-  date: string;
-}
-
-export interface CulinaryItem {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
-  price_range: string;
-  cuisine_type: string;
-  rating: number;
-  notes: string;
+  quantity: number;
   user_id: number;
   created_at: string;
   updated_at: string;
 }
 
+
+export interface CulinaryItem {
+  id: number;
+  name: string;
+  type: string;
+  location: string;
+  description: string;
+}
+
 export interface ItineraryItem {
   id: number;
-  title: string;
-  description: string;
-  location: string;
-  start_time: string;
-  end_time: string;
-  date: string;
   user_id: number;
+  name: string;
+  destination: string;
+  description: string;
+  startDate: string;
+  endDate: string;
   created_at: string;
   updated_at: string;
 }
@@ -79,9 +76,9 @@ export interface ItineraryItem {
 // Auth API
 export const authAPI = {
   login: (data: { email: string; password: string }) =>
-    api.post<{ token: string; user: User }>('/auth/login', data),
+    api.post<{ access_token: string; user: User }>('/auth/login', data),
   register: (data: { email: string; password: string; name: string }) =>
-    api.post<{ token: string; user: User }>('/auth/register', data),
+    api.post<{ access_token: string; user: User }>('/auth/register', data),
   getProfile: () => api.get<User>('/auth/profile'),
 };
 
@@ -105,9 +102,9 @@ export const postsAPI = {
 export const budgetAPI = {
   getAll: () => api.get<BudgetItem[]>('/budget'),
   getById: (id: number) => api.get<BudgetItem>(`/budget/${id}`),
-  create: (data: { category: string; amount: number; description: string; date: string }) =>
+  create: (data: { category: string; unitCost: number; description: string; quantity: number }) =>
     api.post<BudgetItem>('/budget', data),
-  update: (id: number, data: { category: string; amount: number; description: string; date: string }) =>
+  update: (id: number, data: { category: string; unitCost: number; description: string; quantity: number }) =>
     api.put<BudgetItem>(`/budget/${id}`, data),
   delete: (id: number) => api.delete(`/budget/${id}`),
 };
@@ -128,7 +125,7 @@ export const itineraryAPI = {
   create: (data: Omit<ItineraryItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) =>
     api.post<ItineraryItem>('/itineraries', data),
   update: (id: number, data: Partial<ItineraryItem>) =>
-    api.patch<ItineraryItem>(`/itineraries/${id}`, data),
+    api.put<ItineraryItem>(`/itineraries/${id}`, data),
   delete: (id: number) => api.delete(`/itineraries/${id}`),
 };
 
@@ -136,10 +133,10 @@ export const itineraryAPI = {
 export const culinaryAPI = {
   getAll: () => api.get<CulinaryItem[]>('/culinary'),
   getById: (id: number) => api.get<CulinaryItem>(`/culinary/${id}`),
-  create: (data: Omit<CulinaryItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) =>
+  create: (data: Omit<CulinaryItem, 'id'>) =>
     api.post<CulinaryItem>('/culinary', data),
   update: (id: number, data: Partial<CulinaryItem>) =>
-    api.patch<CulinaryItem>(`/culinary/${id}`, data),
+    api.put<CulinaryItem>(`/culinary/${id}`, data),
   delete: (id: number) => api.delete(`/culinary/${id}`),
 };
 

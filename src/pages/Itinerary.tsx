@@ -1,25 +1,28 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { itineraryAPI } from '../utils/api';
+import { itineraryAPI, authAPI, User } from '../utils/api';
+import { jwtDecode } from 'jwt-decode';
 
 interface ItineraryItem {
   id: number;
-  title: string;
+  user_id: number;
+  name: string;
+  destination: string;
   description: string;
-  location: string;
-  start_time: string;
-  end_time: string;
-  date: string;
+  startDate: string;
+  endDate: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ItineraryFormData {
-  title: string;
+  user_id: number;
+  name: string;
+  destination: string;
   description: string;
-  location: string;
-  start_time: string;
-  end_time: string;
-  date: string;
+  startDate: string;
+  endDate: string;
 }
 
 export function Itinerary() {
@@ -27,13 +30,30 @@ export function Itinerary() {
   const [editingItem, setEditingItem] = useState<ItineraryItem | null>(null);
   const queryClient = useQueryClient();
 
+  // Get current user profile
+  const { data: userProfile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => authAPI.getProfile(),
+  });
+
   const { data: itineraryResponse, isLoading } = useQuery({
     queryKey: ['itinerary'],
     queryFn: () => itineraryAPI.getAll(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: ItineraryFormData) => itineraryAPI.create(data),
+    mutationFn: (data: Omit<ItineraryFormData, 'user_id'>) => {
+      
+      const payload = {
+        name: data.name,
+        destination: data.destination,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        user_id: jwtDecode(localStorage.getItem('token') || '').sub
+      };
+      return itineraryAPI.create(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
       setIsCreating(false);
@@ -41,7 +61,7 @@ export function Itinerary() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ItineraryFormData }) =>
+    mutationFn: ({ id, data }: { id: number; data: Partial<ItineraryFormData> }) =>
       itineraryAPI.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
@@ -61,9 +81,9 @@ export function Itinerary() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ItineraryFormData>();
+  } = useForm<Omit<ItineraryFormData, 'user_id'>>();
 
-  const onSubmit = (data: ItineraryFormData) => {
+  const onSubmit = (data: Omit<ItineraryFormData, 'user_id'>) => {
     if (editingItem) {
       updateMutation.mutate({ id: editingItem.id, data });
     } else {
@@ -78,13 +98,13 @@ export function Itinerary() {
 
   const itineraryItems = itineraryResponse?.data || [];
   const sortedItems = [...itineraryItems].sort((a, b) => {
-    const dateA = new Date(`${a.date}T${a.start_time}`);
-    const dateB = new Date(`${b.date}T${b.start_time}`);
+    const dateA = new Date(a.startDate);
+    const dateB = new Date(b.startDate);
     return dateA.getTime() - dateB.getTime();
   });
 
   const groupedItems = sortedItems.reduce((groups, item) => {
-    const date = item.date;
+    const date = item.startDate;
     if (!groups[date]) {
       groups[date] = [];
     }
@@ -115,20 +135,39 @@ export function Itinerary() {
               <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
                 <div>
                   <label
-                    htmlFor="title"
+                    htmlFor="name"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Title
+                    Name
                   </label>
                   <input
                     type="text"
-                    {...register('title', { required: 'Title is required' })}
-                    defaultValue={editingItem?.title}
+                    {...register('name', { required: 'Name is required' })}
+                    defaultValue={editingItem?.name}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
-                  {errors.title && (
+                  {errors.name && (
                     <p className="mt-1 text-sm text-red-600">
-                      {errors.title.message}
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="destination"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Destination
+                  </label>
+                  <input
+                    type="text"
+                    {...register('destination', { required: 'Destination is required' })}
+                    defaultValue={editingItem?.destination}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                  {errors.destination && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.destination.message}
                     </p>
                   )}
                 </div>
@@ -151,84 +190,44 @@ export function Itinerary() {
                     </p>
                   )}
                 </div>
-                <div>
-                  <label
-                    htmlFor="location"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    {...register('location', { required: 'Location is required' })}
-                    defaultValue={editingItem?.location}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                  {errors.location && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.location.message}
-                    </p>
-                  )}
-                </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label
-                      htmlFor="date"
+                      htmlFor="startDate"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Date
+                      Start Date
                     </label>
                     <input
                       type="date"
-                      {...register('date', { required: 'Date is required' })}
-                      defaultValue={editingItem?.date}
+                      {...register('startDate', { required: 'Start date is required' })}
+                      defaultValue={editingItem?.startDate}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
-                    {errors.date && (
+                    {errors.startDate && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.date.message}
+                        {errors.startDate.message}
                       </p>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        htmlFor="start_time"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Start Time
-                      </label>
-                      <input
-                        type="time"
-                        {...register('start_time', { required: 'Start time is required' })}
-                        defaultValue={editingItem?.start_time}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      />
-                      {errors.start_time && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.start_time.message}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="end_time"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        End Time
-                      </label>
-                      <input
-                        type="time"
-                        {...register('end_time', { required: 'End time is required' })}
-                        defaultValue={editingItem?.end_time}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      />
-                      {errors.end_time && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.end_time.message}
-                        </p>
-                      )}
-                    </div>
+                  <div>
+                    <label
+                      htmlFor="endDate"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      {...register('endDate', { required: 'End date is required' })}
+                      defaultValue={editingItem?.endDate}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                    {errors.endDate && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.endDate.message}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3">
@@ -277,15 +276,15 @@ export function Itinerary() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-3">
                           <span className="text-sm font-medium text-gray-900">
-                            {item.title}
+                            {item.name}
                           </span>
                           <span className="text-sm text-gray-500">
-                            {item.start_time} - {item.end_time}
+                            {item.destination}
                           </span>
                         </div>
                         <p className="mt-1 text-sm text-gray-500">{item.description}</p>
                         <p className="mt-1 text-sm text-gray-500">
-                          Location: {item.location}
+                          {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex space-x-2">

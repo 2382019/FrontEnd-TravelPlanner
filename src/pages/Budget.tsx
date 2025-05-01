@@ -5,9 +5,9 @@ import { budgetAPI, BudgetItem } from '../utils/api';
 
 interface BudgetFormData {
   category: string;
-  amount: number;
+  unitCost: number;
   description: string;
-  date: string;
+  quantity: number;
 }
 
 export function Budget() {
@@ -65,7 +65,7 @@ export function Budget() {
   }
 
   const budgetItems = budgetResponse?.data || [];
-  const totalAmount = budgetItems.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = budgetItems.reduce((sum, item) => sum + (item.unitCost * item.quantity), 0);
 
   return (
     <div className="py-6">
@@ -121,24 +121,49 @@ export function Budget() {
                 </div>
                 <div>
                   <label
-                    htmlFor="amount"
+                    htmlFor="quantity"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Amount
+                    Quantity
                   </label>
                   <input
                     type="number"
-                    step="0.01"
-                    {...register('amount', {
-                      required: 'Amount is required',
-                      min: { value: 0, message: 'Amount must be positive' },
+                    step="1"
+                    {...register('quantity', {
+                      required: 'Quantity is required',
+                      min: { value: 1, message: 'Quantity must be at least 1' },
+                      valueAsNumber: true,
                     })}
-                    defaultValue={editingItem?.amount}
+                    defaultValue={editingItem?.quantity || 1}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
-                  {errors.amount && (
+                  {errors.quantity && (
                     <p className="mt-1 text-sm text-red-600">
-                      {errors.amount.message}
+                      {errors.quantity.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="unitCost"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Unit Cost
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    {...register('unitCost', {
+                      required: 'Unit cost is required',
+                      min: { value: 0, message: 'Unit cost must be positive' },
+                      valueAsNumber: true,
+                    })}
+                    defaultValue={editingItem?.unitCost}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                  {errors.unitCost && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.unitCost.message}
                     </p>
                   )}
                 </div>
@@ -158,25 +183,6 @@ export function Budget() {
                   {errors.description && (
                     <p className="mt-1 text-sm text-red-600">
                       {errors.description.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="date"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    {...register('date', { required: 'Date is required' })}
-                    defaultValue={editingItem?.date}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                  {errors.date && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.date.message}
                     </p>
                   )}
                 </div>
@@ -218,12 +224,12 @@ export function Budget() {
                       {item.category}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {new Date(item.date).toLocaleDateString()}
+                      Quantity: {item.quantity}
                     </p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <span className="text-lg font-medium text-gray-900">
-                      ${item.amount.toFixed(2)}
+                      ${(item.unitCost * item.quantity).toFixed(2)}
                     </span>
                     <div className="flex space-x-2">
                       <button

@@ -3,23 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { packingAPI } from '../utils/api';
 
-interface PackingItem {
-  id: number;
-  name: string;
-  category: string;
-  quantity: number;
-  is_packed: boolean;
-}
-
 interface PackingFormData {
   name: string;
-  category: string;
-  quantity: number;
+  isChecked: boolean;
 }
 
 export function Packing() {
   const [isCreating, setIsCreating] = useState(false);
-  const [editingItem, setEditingItem] = useState<PackingItem | null>(null);
+  const [editingItem, setEditingItem] = useState<any | null>(null);
   const queryClient = useQueryClient();
 
   const { data: packingResponse, isLoading } = useQuery({
@@ -51,16 +42,6 @@ export function Packing() {
     },
   });
 
-  const togglePackedMutation = useMutation({
-    mutationFn: (id: number) => {
-      const item = packingResponse?.data.find((i: PackingItem) => i.id === id);
-      return packingAPI.update(id, { ...item, is_packed: !item.is_packed });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['packing'] });
-    },
-  });
-
   const {
     register,
     handleSubmit,
@@ -82,13 +63,17 @@ export function Packing() {
   }
 
   const packingItems = packingResponse?.data || [];
-  const categories = ['Clothing', 'Toiletries', 'Electronics', 'Documents', 'Other'];
 
   return (
     <div className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900">Packing List</h1>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Packing List</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Total Items: {packingItems.length}
+            </p>
+          </div>
           <button
             onClick={() => setIsCreating(true)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
@@ -124,53 +109,19 @@ export function Packing() {
                     </p>
                   )}
                 </div>
-                <div>
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Category
-                  </label>
-                  <select
-                    {...register('category', { required: 'Category is required' })}
-                    defaultValue={editingItem?.category}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.category && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.category.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="quantity"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Quantity
-                  </label>
+                <div className="flex items-center">
                   <input
-                    type="number"
-                    min="1"
-                    {...register('quantity', {
-                      required: 'Quantity is required',
-                      min: { value: 1, message: 'Quantity must be at least 1' },
-                    })}
-                    defaultValue={editingItem?.quantity}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    type="checkbox"
+                    {...register('isChecked')}
+                    defaultChecked={editingItem?.isChecked}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  {errors.quantity && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.quantity.message}
-                    </p>
-                  )}
+                  <label
+                    htmlFor="isChecked"
+                    className="ml-2 block text-sm text-gray-900"
+                  >
+                    Packed
+                  </label>
                 </div>
                 <div className="flex justify-end space-x-3">
                   <button
@@ -198,62 +149,51 @@ export function Packing() {
 
         {/* Packing Items List */}
         <div className="mt-8 space-y-6">
-          {categories.map((category) => {
-            const categoryItems = packingItems.filter(
-              (item: PackingItem) => item.category === category
-            );
-            if (categoryItems.length === 0) return null;
-
-            return (
-              <div key={category} className="bg-white shadow sm:rounded-lg overflow-hidden">
-                <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">{category}</h3>
-                  <div className="space-y-4">
-                    {categoryItems.map((item: PackingItem) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between py-2 border-b last:border-b-0"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <input
-                            type="checkbox"
-                            checked={item.is_packed}
-                            onChange={() => togglePackedMutation.mutate(item.id)}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                          />
-                          <span
-                            className={`text-sm ${
-                              item.is_packed ? 'line-through text-gray-500' : 'text-gray-900'
-                            }`}
-                          >
-                            {item.name} ({item.quantity})
-                          </span>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => setEditingItem(item)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (window.confirm('Are you sure you want to delete this item?')) {
-                                deleteMutation.mutate(item.id);
-                              }
-                            }}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+          {packingItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white shadow sm:rounded-lg overflow-hidden"
+            >
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={item.isChecked}
+                      onChange={() => {
+                        updateMutation.mutate({
+                          id: item.id,
+                          data: { ...item, isChecked: !item.isChecked },
+                        });
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <h3 className="ml-3 text-lg font-medium text-gray-900">
+                      {item.name}
+                    </h3>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setEditingItem(item)}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this item?')) {
+                          deleteMutation.mutate(item.id);
+                        }
+                      }}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

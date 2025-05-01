@@ -6,7 +6,6 @@ import { MainLayout } from './layouts/MainLayout';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
-import { Posts } from './pages/Posts';
 import { Budget } from './pages/Budget';
 import { Packing } from './pages/Packing';
 import { Itinerary } from './pages/Itinerary';
@@ -37,7 +36,6 @@ function App() {
               }
             >
               <Route index element={<Dashboard />} />
-              <Route path="posts" element={<Posts />} />
               <Route path="budget" element={<Budget />} />
               <Route path="packing" element={<Packing />} />
               <Route path="itinerary" element={<Itinerary />} />

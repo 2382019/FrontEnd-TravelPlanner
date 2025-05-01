@@ -17,7 +17,7 @@ export function Login() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data);
-      navigate(from, { replace: true });
+      navigate("/", { replace: true });
     } catch (error) {
       console.error('Login failed:', error);
     }
