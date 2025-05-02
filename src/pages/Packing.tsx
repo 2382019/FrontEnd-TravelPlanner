@@ -149,7 +149,7 @@ export function Packing() {
 
         {/* Packing Items List */}
         <div className="mt-8 space-y-6">
-          {packingItems.map((item) => (
+          {packingItems.map((item : {isChecked : boolean, name : string, id : number}) => (
             <div
               key={item.id}
               className="bg-white shadow sm:rounded-lg overflow-hidden"
