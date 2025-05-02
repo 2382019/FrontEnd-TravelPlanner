@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { itineraryAPI, authAPI, User } from '../utils/api';
+import { itineraryAPI, authAPI, } from '../utils/api';
 import { jwtDecode } from 'jwt-decode';
 
 interface ItineraryItem {
@@ -31,7 +31,7 @@ export function Itinerary() {
   const queryClient = useQueryClient();
 
   // Get current user profile
-  const { data: userProfile } = useQuery({
+  const {  } = useQuery({
     queryKey: ['profile'],
     queryFn: () => authAPI.getProfile(),
   });
