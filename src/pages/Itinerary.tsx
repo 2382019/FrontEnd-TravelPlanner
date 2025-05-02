@@ -119,7 +119,7 @@ export function Itinerary() {
           <h1 className="text-2xl font-semibold text-gray-900">Itinerary</h1>
           <button
             onClick={() => setIsCreating(true)}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            className="bg-[#663366] text-white px-4 py-2 rounded-md hover:bg-[#4d264d]"
           >
             Add Activity
           </button>
@@ -238,13 +238,13 @@ export function Itinerary() {
                       setEditingItem(null);
                       reset();
                     }}
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#663366]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                    className="bg-[#663366] text-white px-4 py-2 rounded-md hover:bg-[#4d264d]"
                   >
                     {editingItem ? 'Update' : 'Add'}
                   </button>
@@ -290,7 +290,7 @@ export function Itinerary() {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => setEditingItem(item)}
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="text-[#663366] hover:text-[#4d264d]"
                         >
                           Edit
                         </button>

@@ -17,8 +17,8 @@ export function MainLayout() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link to="/" className="text-xl font-bold text-indigo-600">
-                  Travel Planner
+              <Link to="/" className="text-xl font-bold text-purple-300">
+              Travel Planner
                 </Link>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

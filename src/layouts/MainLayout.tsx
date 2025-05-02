@@ -31,14 +31,14 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Disclosure as="nav" className="bg-white shadow-sm">
+      <Disclosure as="nav" className="bg-[#C8A2C8] shadow-sm sticky top-0 z-50">
         {({ open }) => (
           <>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 justify-between">
                 <div className="flex">
                   <div className="flex flex-shrink-0 items-center">
-                    <Link to="/" className="text-xl font-bold text-indigo-600">
+                    <Link to="/" className="text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors duration-200">
                       Travel Planner
                     </Link>
                   </div>
@@ -49,9 +49,9 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                         to={item.href}
                         className={classNames(
                           item.current
-                            ? 'border-indigo-500 text-gray-900'
-                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium'
+                            ? 'border-gray-800 text-gray-900'
+                            : 'border-transparent text-gray-700 hover:border-gray-600 hover:text-gray-800',
+                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors duration-200'
                         )}
                       >
                         {item.name}
@@ -63,10 +63,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   {isAuthenticated ? (
                     <Menu as="div" className="relative ml-3">
                       <div>
-                        <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#C8A2C8] focus:ring-offset-2 transition-shadow duration-200">
                           <span className="sr-only">Open user menu</span>
-                          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-indigo-600 font-medium">
+                          <div className="h-8 w-8 rounded-full bg-[#f5f0f5] flex items-center justify-center hover:bg-[#e8dfe8] transition-colors duration-200">
+                            <span className="text-[#C8A2C8] font-medium">
                               {user?.username?.[0]?.toUpperCase()}
                             </span>
                           </div>
@@ -87,8 +87,8 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                               <button
                                 onClick={handleLogout}
                                 className={classNames(
-                                  active ? 'bg-gray-100' : '',
-                                  'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                                  active ? 'bg-[#f5f0f5]' : '',
+                                  'block w-full text-left px-4 py-2 text-sm text-gray-700 transition-colors duration-200'
                                 )}
                               >
                                 Sign out
@@ -102,13 +102,13 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     <div className="space-x-4">
                       <Link
                         to="/login"
-                        className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                        className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                       >
                         Sign in
                       </Link>
                       <Link
                         to="/register"
-                        className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
+                        className="bg-white text-[#663366] hover:bg-gray-100 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                       >
                         Sign up
                       </Link>
@@ -116,7 +116,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   )}
                 </div>
                 <div className="-mr-2 flex items-center sm:hidden">
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-[#b992b9] hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white transition-colors duration-200">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -137,9 +137,9 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                        : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700',
-                      'block border-l-4 py-2 pl-3 pr-4 text-base font-medium'
+                        ? 'bg-[#b992b9] text-gray-900'
+                        : 'text-gray-700 hover:bg-[#b992b9] hover:text-gray-900',
+                      'block px-4 py-2 text-base font-medium transition-colors duration-200'
                     )}
                   >
                     {item.name}
@@ -147,20 +147,20 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </div>
               {isAuthenticated ? (
-                <div className="border-t border-gray-200 pb-3 pt-4">
+                <div className="border-t border-[#b992b9] pb-3 pt-4">
                   <div className="flex items-center px-4">
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <span className="text-indigo-600 font-medium">
+                      <div className="h-10 w-10 rounded-full bg-[#f5f0f5] flex items-center justify-center">
+                        <span className="text-[#C8A2C8] font-medium">
                           {user?.username?.[0]?.toUpperCase()}
                         </span>
                       </div>
                     </div>
                     <div className="ml-3">
-                      <div className="text-base font-medium text-gray-800">
+                      <div className="text-base font-medium text-gray-900">
                         {user?.username}
                       </div>
-                      <div className="text-sm font-medium text-gray-500">
+                      <div className="text-sm font-medium text-gray-700">
                         {user?.email}
                       </div>
                     </div>
@@ -169,26 +169,26 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     <Disclosure.Button
                       as="button"
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                      className="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-[#b992b9] hover:text-gray-900 transition-colors duration-200"
                     >
                       Sign out
                     </Disclosure.Button>
                   </div>
                 </div>
               ) : (
-                <div className="border-t border-gray-200 pb-3 pt-4">
+                <div className="border-t border-[#b992b9] pb-3 pt-4">
                   <div className="space-y-1">
                     <Disclosure.Button
                       as={Link}
                       to="/login"
-                      className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                      className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-[#b992b9] hover:text-gray-900 transition-colors duration-200"
                     >
                       Sign in
                     </Disclosure.Button>
                     <Disclosure.Button
                       as={Link}
                       to="/register"
-                      className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                      className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-[#b992b9] hover:text-gray-900 transition-colors duration-200"
                     >
                       Sign up
                     </Disclosure.Button>
