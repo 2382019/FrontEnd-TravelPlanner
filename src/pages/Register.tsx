@@ -1,9 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
+import { useState } from 'react';
 
 interface RegisterFormData {
-  name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -14,17 +15,22 @@ export function Register() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const password = watch('password');
+  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
+      setError(null);
+      console.log('Submitting registration data:', data);
       await registerUser({
-        name: data.name,
+        username: data.username,
         email: data.email,
         password: data.password,
       });
-      navigate('/');
-    } catch (error) {
+      console.log('Registration successful, navigating to login');
+      navigate('/login');
+    } catch (error: any) {
       console.error('Registration failed:', error);
+      setError(error.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -36,26 +42,31 @@ export function Register() {
             Create your account
           </h2>
         </div>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="name" className="sr-only">
-                Name
+              <label htmlFor="username" className="sr-only">
+                Username
               </label>
               <input
-                {...register('name', {
-                  required: 'Name is required',
+                {...register('username', {
+                  required: 'Username is required',
                   minLength: {
                     value: 3,
-                    message: 'Name must be at least 3 characters',
+                    message: 'Username must be at least 3 characters',
                   },
                 })}
                 type="text"
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                placeholder="Name"
+                placeholder="Username"
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
               )}
             </div>
             <div>

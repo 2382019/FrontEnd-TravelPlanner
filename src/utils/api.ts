@@ -77,8 +77,8 @@ export interface ItineraryItem {
 export const authAPI = {
   login: (data: { email: string; password: string }) =>
     api.post<{ access_token: string; user: User }>('/auth/login', data),
-  register: (data: { email: string; password: string; name: string }) =>
-    api.post<{ access_token: string; user: User }>('/auth/register', data),
+  register: (data: { email: string; password: string; username: string }) =>
+    api.post('/auth/register', data),
   getProfile: () => api.get<User>('/auth/profile'),
 };
 

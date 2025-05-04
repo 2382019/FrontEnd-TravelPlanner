@@ -5,7 +5,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (data: { email: string; password: string }) => Promise<void>;
-  register: (data: { email: string; password: string; name: string }) => Promise<void>;
+  register: (data: { email: string; password: string; username: string }) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -16,9 +16,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
-
-
- 
 
   const login = async (data: { email: string; password: string }) => {
     try {
@@ -34,15 +31,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (data: { email: string; password: string; name: string }) => {
+  const register = async (data: { email: string; password: string; username: string }) => {
     try {
-      const response = await authAPI.register(data);
-      const { access_token: newToken, user: userData } = response.data;
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setUser(userData);
-
-      setIsAuthenticated(true);
+      await authAPI.register(data);
+      // Registration successful but no token is returned
+      // User needs to login separately
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
